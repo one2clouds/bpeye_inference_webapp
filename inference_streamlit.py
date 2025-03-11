@@ -31,11 +31,6 @@ def predict_disease(img_path, img_transform, my_transforms, model, device):
 
 
 def Glaucoma_Classification():
-
-    def load_images():
-        image_files = glob.glob("images/*.jpg")  # Adjust path as needed
-        return sorted(image_files)
-
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     classes = ['NRG', 'RG']
 
@@ -119,16 +114,44 @@ def Glaucoma_Classification():
                     unsafe_allow_html=True
                 )
 
-    images = load_images()
+    st.title("Background")
+    st.write("Effects of Glaucoma")
+    st.write("Damaged caused by Glaucoma can't be reversed. If detected early, vision loss can be prevented.")    
+    image = Image.open("./images/effects_of_glaucoma.png")
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    print(images)
+    st.write("For Glaucoma, focusing primaily on the Optic Cup Disc areas")
+    image = Image.open("./images/Normal_vs_Zoomed.png")
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    index = st.slider("Select Image Pair", 0, len(images) - 2, 0, 2)
+    st.write("Large Cup")
+    st.write("Optic Cup enlarges relative to the optic disc")    
+    image = Image.open("./images/Large_Cup.png")
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    cols = st.columns(2)
-    cols[0].image(images[index], caption=f"Image {index + 1}")
-    cols[1].image(images[index + 1], caption=f"Image {index + 2}")
+    st.write("Appearance neuro-retinal rim superiorly & inferiorly")
+    st.write("Neuro-retinal Rim : Pinkish Tissue surrounding optic cup.")    
+    image = Image.open("./images/Neuroretinal_Rim.png")
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
+    st.write("Nasalization (Nasal) Displacement of vessel trunk")
+    st.write("Nasal = Central retinal artery/vein trunk shifts toward the nasal side of the optic disc")    
+    st.write("As optic cup gets larger, blood vessels pushed to nasal side")    
+    image = Image.open("./images/effects_of_glaucoma.png")
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+
+    st.write("Baring of the circum-linear vessel superiorly and inferiorly")
+    st.write("Circumlinear vessels : tiny blood vessels around optic disc")
+    st.write("Baring : vessel appear displaced along optic cup")
+    image = Image.open("./images/effects_of_glaucoma.png")
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+
+    st.write("Disc Hemorrhage(s)")
+    st.write("A small bleed on the optic disc surface because of pressure inside eye (Intraocular Pressure")
+    st.write("Diagnostic criteria for glaucoma may not be met at the time of disc hemorrhage observation")
+    st.write("Some results show many eyes may eventually progress to glaucoma after disc hemorrhage")
+    image = Image.open("./images/effects_of_glaucoma.png")
+    st.image(image, caption="Uploaded Image", use_column_width=True)
 
     print("Hello, model loaded")
 

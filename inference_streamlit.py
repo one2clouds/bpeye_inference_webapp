@@ -10,7 +10,7 @@ from PIL import Image
 from torchvision.models import ResNet50_Weights
 from src.models.res_net_module import Res_Net
 from optic_cup_disk_segmentation import Optic_Disc_Cup_Segmentation
-
+import glob
 
 def predict_disease(img_path, img_transform, my_transforms, model, device): 
 
@@ -31,6 +31,10 @@ def predict_disease(img_path, img_transform, my_transforms, model, device):
 
 
 def Glaucoma_Classification():
+
+    def load_images():
+        image_files = glob.glob("images/*.jpg")  # Adjust path as needed
+        return sorted(image_files)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     classes = ['NRG', 'RG']
@@ -60,11 +64,9 @@ def Glaucoma_Classification():
     ToPILImage(),
     ])
 
+
     st.title("Glaucoma Classification")
     html_temp = """
-    <div style="background-color:#40B3DF;padding:10px">
-    <h2 style="color:white;text-align:center;">Streamlit Glaucoma CLassification App </h2>
-    </div>
     <style>
     .stButton>button {
         background: linear-gradient(135deg, #6a5acd, #4caf50); /* Soft purple to green */
@@ -117,6 +119,17 @@ def Glaucoma_Classification():
                     unsafe_allow_html=True
                 )
 
+    images = load_images()
+
+    print(images)
+
+    index = st.slider("Select Image Pair", 0, len(images) - 2, 0, 2)
+
+    cols = st.columns(2)
+    cols[0].image(images[index], caption=f"Image {index + 1}")
+    cols[1].image(images[index + 1], caption=f"Image {index + 2}")
+
+
     print("Hello, model loaded")
 
 
@@ -150,6 +163,19 @@ def AMD_Classification():
 
 
 if __name__ == "__main__":
+    st.set_page_config(page_title="NAAMII - BPEye WebApp")
+
+    hide_st_style = """
+                <style>
+                #MainMenu {visibility: hidden;}
+                footer {visibility: hidden;}
+                header {visibility: hidden;}
+                </style>
+                """
+    st.markdown(hide_st_style, unsafe_allow_html=True)
+
+
+
     st.sidebar.header("Select the Task")
     menu = ["Glaucoma CLassification", "AMD Classification", "Optic Cup Disc Segmentation"]
     choice = st.sidebar.selectbox(label='Menu', options=menu)

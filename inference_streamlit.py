@@ -12,6 +12,7 @@ from src.models.res_net_module import Res_Net
 from optic_cup_disk_segmentation import Optic_Disc_Cup_Segmentation
 import glob
 from some_backgrounds_glaucomic_features import some_backgrounds
+
 def predict_disease(img_path, img_transform, my_transforms, model, device): 
 
     preprocessed_img = img_transform(img_path)
@@ -123,9 +124,6 @@ def Glaucoma_Classification():
 def AMD_Classification():
     st.title("AMD Classification")
     html_temp = """
-    <div style="background-color:#40B3DF;padding:10px">
-    <h2 style="color:white;text-align:center;">Streamlit Glaucoma CLassification App </h2>
-    </div>
     <style>
     .stButton>button {
         background: linear-gradient(135deg, #6a5acd, #4caf50); /* Soft purple to green */
@@ -163,10 +161,10 @@ if __name__ == "__main__":
 
 
     st.sidebar.header("Select the Task")
-    menu = ["Glaucoma CLassification", "AMD Classification", "Optic Cup Disc Segmentation"]
+    menu = ["Glaucoma Classification", "AMD Classification", "Optic Cup Disc Segmentation"]
     choice = st.sidebar.selectbox(label='Menu', options=menu)
 
-    if choice == "Glaucoma CLassification":
+    if choice == "Glaucoma Classification":
         Glaucoma_Classification()
     if choice == "AMD Classification":
         AMD_Classification()

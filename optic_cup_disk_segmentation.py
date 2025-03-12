@@ -7,6 +7,8 @@ from transformers import AutoImageProcessor, SegformerForSemanticSegmentation
 import streamlit as st 
 from PIL import Image
 from torchvision.transforms import transforms
+from streamlit_image_comparison import image_comparison
+import io
 
 
 def process_image(image, processor, model):
@@ -33,6 +35,13 @@ def process_image(image, processor, model):
     pred_disc_cup = upsampled_logits.argmax(dim=1)[0].numpy().astype(np.uint8)
 
     return pred_disc_cup
+
+def fig2img(fig): 
+    buf = io.BytesIO() 
+    fig.savefig(buf) 
+    buf.seek(0) 
+    img = Image.open(buf) 
+    return img 
 
 
 def Optic_Disc_Cup_Segmentation():
@@ -68,13 +77,28 @@ def Optic_Disc_Cup_Segmentation():
 
         pred_disc_cup = process_image(image_arr, processor, model)
 
-        # Display the input image, predicted segmentation, and original result picture
-        fig, axes = plt.subplots(1, 2, figsize=(18, 6))
-        axes[0].imshow(image)
-        axes[0].set_title('Input Image')
-        axes[0].axis('off')
-        axes[1].imshow(pred_disc_cup, cmap='gray')
-        axes[1].set_title('Predicted Segmentation')
-        axes[1].axis('off')
+        fig, axes = plt.subplots(figsize=(8, 6))
+        axes.imshow(image)
+        axes.axis('off')
+        fig.tight_layout(pad=0)
+        # fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+        # axes.margins(x=0, y=0)
+        image = fig2img(fig) 
 
-        st.pyplot(fig, use_container_width=False)
+        fig, axes = plt.subplots(1, 1, figsize=(8, 6))
+        axes.imshow(pred_disc_cup, cmap='gray')
+        # st.pyplot(fig, use_container_width=False)
+        axes.axis('off')
+        fig.tight_layout(pad=0)
+        # fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+
+        # axes.margins(x=0, y=0)
+        segmentation = fig2img(fig)
+
+        # st.image(image)
+        # st.image(segmentation)
+
+        image_comparison(
+            img1=image,
+            img2=segmentation,
+        )

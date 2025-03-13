@@ -140,7 +140,14 @@ def AMD_Classification():
     st.markdown(html_temp,unsafe_allow_html=True)
 
     uploaded_file = st.file_uploader("", type=["jpg", "png", "jpeg"])
-    
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file)
+        max_width, max_height = 300, 300
+        image_tensor = transforms.PILToTensor()(image)
+
+        image.thumbnail(size = (max_width, max_height))
+        st.image(image, caption="", use_container_width=False)
+
 
 
 

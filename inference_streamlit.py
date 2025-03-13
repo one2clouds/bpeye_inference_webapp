@@ -41,7 +41,7 @@ def Glaucoma_Classification():
 
     # model = Res_Net(len(classes))
     torch.serialization.add_safe_globals([Res_Net])
-    checkpoint = torch.load('/home/shirshak/inference_BPEye_Project_2024/glaucoma_resnet_airogs_focal/epoch_018.ckpt', weights_only=False)
+    checkpoint = torch.load('./glaucoma_resnet_airogs_focal/epoch_018.ckpt', weights_only=False)
     state_dict = {k.replace('net.model.', ''): v for k,v in checkpoint['state_dict'].items()}
     model.load_state_dict(state_dict)
     model.to(device)
@@ -122,6 +122,34 @@ def Glaucoma_Classification():
 
 
 def AMD_Classification():
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    classes = ['AMD', 'Non-AMD']
+
+
+    model = torchvision.models.resnet50(weights=ResNet50_Weights.DEFAULT)
+    model.fc = nn.Linear(model.fc.in_features, len(classes))
+
+    # model = Res_Net(len(classes))
+    torch.serialization.add_safe_globals([Res_Net])
+    checkpoint = torch.load('./amd_resnet_airogs/epoch_018.ckpt', weights_only=False)
+    state_dict = {k.replace('net.model.', ''): v for k,v in checkpoint['state_dict'].items()}
+    model.load_state_dict(state_dict)
+    model.to(device)
+
+    my_transforms = transforms.Compose([
+        # transforms.ToPILImage(), 
+        transforms.ToTensor(), # convert 0-255 to 0-1 and from np to tensors
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+        transforms.Resize(size=(512,512),antialias=True)
+    ])
+
+    img_transform = Compose([
+    # Lambda(read_image), # because we have already converted our image to tensor
+    Lambda(crop_nonzero),
+    Lambda(pad_to_largest_square),
+    ToPILImage(),
+    ])
+
     st.title("AMD Classification")
     html_temp = """
     <style>
@@ -148,9 +176,33 @@ def AMD_Classification():
         image.thumbnail(size = (max_width, max_height))
         st.image(image, caption="", use_container_width=False)
 
+    
+    result=""
+    if st.button("Predict", key="predict_button_2"):
+        if uploaded_file is None:
+            st.warning("Please Upload an image from above to get predictions.")
+        else:
+            predicted_label, confidence_percentage = predict_amd_disease(image_tensor, img_transform, my_transforms, model, device)
+            
+            # Define styles for different cases
+            if predicted_label == "AMD":
+                st.markdown(
+                    f"""
+                    <div style="background-color: #ffcccc; color: #666666;
+                        padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; text-align: center; border: 2px solid red; "> <b>{predicted_label} and Confidence Score : {confidence_percentage:.2f}</b>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
-
-
+            elif predicted_label == "Non-AMD":
+                st.markdown(
+                    f"""
+                    <div style=" background-color: #ccffcc; color: #666666; padding: 15px; border-radius: 10px; font-size: 18px; font-weight: bold; text-align: center; border: 2px solid green; "> <b>{predicted_label} and Confidence Score : {confidence_percentage:.2f}</b>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
 
 if __name__ == "__main__":

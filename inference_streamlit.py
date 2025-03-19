@@ -12,10 +12,13 @@ from src.models.res_net_module import Res_Net
 from optic_cup_disk_segmentation import Optic_Disc_Cup_Segmentation
 import glob
 from some_backgrounds_glaucomic_features import some_backgrounds
+from utils import predict_amd_disease
 
 def predict_disease(img_path, img_transform, my_transforms, model, device): 
 
     preprocessed_img = img_transform(img_path)
+
+    # print(torchvision.transforms.functional.pil_to_tensor(preprocessed_img).shape)
 
     preprocessed_transformed_image = my_transforms(preprocessed_img)
 
@@ -23,9 +26,15 @@ def predict_disease(img_path, img_transform, my_transforms, model, device):
     # print(preprocessed_transformed_image.shape)
 
     outputs = nn.Sigmoid()(model(preprocessed_transformed_image))
+
     confidence_score, predicted_test = torch.max(outputs, 1)
 
-    predicted_label = "Referable Glaucoma" if predicted_test.item() == 1 else "Non-Referable Glaucoma"
+    threshold_value = 0.7
+
+    if predicted_test == 0 and confidence_score > threshold_value:
+        predicted_label = "Non-Referable Glaucoma"
+    else:
+        predicted_label = "Referable Glaucoma"
 
     return predicted_label, confidence_score.item()*100
 
@@ -41,7 +50,9 @@ def Glaucoma_Classification():
 
     # model = Res_Net(len(classes))
     torch.serialization.add_safe_globals([Res_Net])
-    checkpoint = torch.load('./glaucoma_resnet_airogs_focal/epoch_018.ckpt', weights_only=False)
+    # checkpoint = torch.load('./glaucoma_resnet_airogs_focal/epoch_018.ckpt', weights_only=False)
+    checkpoint = torch.load('./glaucoma/epoch_018.ckpt', weights_only=False)
+
     state_dict = {k.replace('net.model.', ''): v for k,v in checkpoint['state_dict'].items()}
     model.load_state_dict(state_dict)
     model.to(device)
@@ -131,7 +142,7 @@ def AMD_Classification():
 
     # model = Res_Net(len(classes))
     torch.serialization.add_safe_globals([Res_Net])
-    checkpoint = torch.load('./amd_resnet_airogs/epoch_018.ckpt', weights_only=False)
+    checkpoint = torch.load('./amd/epoch_018.ckpt', weights_only=False)
     state_dict = {k.replace('net.model.', ''): v for k,v in checkpoint['state_dict'].items()}
     model.load_state_dict(state_dict)
     model.to(device)

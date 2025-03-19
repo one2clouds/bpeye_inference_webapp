@@ -7,6 +7,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+amd/
+glaucoma/
+temp/
+
 # C extensions
 *.so
 

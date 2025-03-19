@@ -1,6 +1,10 @@
-torch
-torchvision 
-scikit-learn
-monai
-omegaconf
-streamlit
+torch == 2.6.0
+torchvision == 0.21.0
+scikit-learn == 1.6.1
+monai == 1.4.0
+omegaconf == 2.3.0
+streamlit == 1.43.2
+opencv-python == 4.11.0.86
+matplotlib == 3.10.1
+transformer == 4.49.0
+streamlit-image-comparison == 0.0.4
